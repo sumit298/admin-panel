@@ -1,0 +1,33 @@
+.container h2 {
+  text-align: center;
+  margin: 25px auto;
+}
+
+.list {
+  text-align: left;
+  max-width: 750px;
+  margin: auto;
+}
+
+.submit-form {
+  max-width: 300px;
+  margin: auto;
+}
+.profile {
+  border: 2px solid red;
+  border-radius: 50px;
+}
+.Admin-profile {
+  justify-content: center;
+  align-items: center;
+  margin-left: 120;
+}
+.edit-form {
+  max-width: 300px;
+  margin: auto;
+}
+.container mt-3,
+.mt-3,
+.my-3 {
+  margin-top: 5rem !important;
+}
