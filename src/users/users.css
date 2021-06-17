@@ -1,0 +1,46 @@
+.eyeIcon {
+  color: darkgray;
+  float: right;
+  cursor: pointer;
+}
+.eyeIcon:hover,
+.eyeIcon:active {
+  color: black;
+  transition: 0.3s;
+}
+.profile {
+  border: 1px solid rgba(20, 8, 8, 0.315);
+  border-radius: 50px;
+  height: 100px;
+  width: 100px;
+  background-size: cover;
+}
+.form-add-group {
+  /*  top: 50% !important;
+  left: 50% !important;
+  transform: translate(3%, 22%) !important; */
+  width: 400px;
+  display: table;
+  margin-top: 5%;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 5px;
+  border-radius: 5px;
+  text-align: center;
+}
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+  height: 35px;
+  width: 100%;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  padding: 4px 5px;
+  background: #fff;
+  border: 1px solid #d0d0d0;
+  outline: none;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}

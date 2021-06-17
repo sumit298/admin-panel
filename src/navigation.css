@@ -1,0 +1,9 @@
+.logOut {
+  cursor: pointer;
+  margin-left: auto;
+}
+.logOut:hover,
+.logOut:active {
+  color: black;
+  transition: 0.3s;
+}

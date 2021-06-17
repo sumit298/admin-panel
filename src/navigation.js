@@ -51,9 +51,10 @@ import React, { Component } from "react";
 import { Switch, Route, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
+import "./navigation.css";
 import AddIcon from "@material-ui/icons/AddCircle";
 import Tooltip from "@material-ui/core/Tooltip";
-
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import PropTypes from "prop-types";
 import {
   CssBaseline,
@@ -77,7 +78,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 import PersonIcon from "@material-ui/icons/Person";
 import GroupIcon from "@material-ui/icons/Group";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
-
+import firebase from "firebase";
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -128,11 +129,9 @@ function Navigation(props) {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
-
+  const signOutUser = () => firebase.auth().signOut();
   const drawer = (
     <div>
-      <div className={classes.toolbar} />
-
       <List>
         <ListItem className="Admin-profile">
           <AccountCircleIcon fontSize="large" color="secondary" />
@@ -189,9 +188,9 @@ function Navigation(props) {
           <Typography variant="h6" noWrap>
             Chat Application
           </Typography>
+          <ExitToAppIcon onClick={signOutUser} className="logOut" />
         </Toolbar>
       </AppBar>
-
       <nav className={classes.drawer} aria-label="mailbox folders">
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Hidden smUp implementation="css">

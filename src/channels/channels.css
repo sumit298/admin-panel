@@ -1,0 +1,10 @@
+.eyeIcon {
+  color: darkgray;
+  float: right;
+  cursor: pointer;
+}
+.eyeIcon:hover,
+.eyeIcon:active {
+  color: black;
+  transition: 0.3s;
+}

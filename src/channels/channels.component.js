@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import channelsDataService from "../services/channels.service";
-
+import Button from "@material-ui/core/Button";
 export default class channels extends Component {
   constructor(props) {
     super(props);
     this.onChangename = this.onChangename.bind(this);
     this.onChangedetails = this.onChangedetails.bind(this);
+    this.onChangeusername = this.onChangeusername.bind(this);
     this.updatechannels = this.updatechannels.bind(this);
     this.deletechannels = this.deletechannels.bind(this);
 
@@ -13,13 +14,12 @@ export default class channels extends Component {
       currentchannels: {
         key: null,
         name: "",
-       details:"",
-       /* avatar:"", */
+        details: "",
+        createdBy: [],
       },
       message: "",
     };
   }
-
   static getDerivedStateFromProps(nextProps, prevState) {
     const { channels } = nextProps;
     if (prevState.currentchannels.key !== channels.key) {
@@ -50,6 +50,18 @@ export default class channels extends Component {
       };
     });
   }
+  onChangeusername(e) {
+    const name = e.target.value;
+
+    this.setState(function (prevState) {
+      return {
+        currentchannels: {
+          ...prevState.currentchannels,
+          name: name,
+        },
+      };
+    });
+  }
 
   onChangedetails(e) {
     const details = e.target.value;
@@ -61,7 +73,7 @@ export default class channels extends Component {
       },
     }));
   }
-  
+
   updatechannels() {
     const data = {
       name: this.state.currentchannels.name,
@@ -93,22 +105,13 @@ export default class channels extends Component {
 
   render() {
     const { currentchannels } = this.state;
-
+    console.log(currentchannels.createdBy);
     return (
       <div>
-        <h4>channels</h4>
+        <h4>Channel Information</h4>
         {currentchannels ? (
           <div className="edit-form">
             <form>
-              {/* <div className="form-group">
-                <label htmlFor="title">Avatar</label>
-                <img
-                  type="text"
-                  className="form-control"
-                  id="ID"
-                  src={currentchannels.avatar}
-                />
-              </div> */}
               <div className="form-group">
                 <label htmlFor="ID">Channel ID</label>
                 <input
@@ -138,29 +141,60 @@ export default class channels extends Component {
                   onChange={this.onChangedetails}
                 />
               </div>
-             
+              <div className="form-group">
+                <label htmlFor="title"> User Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="username"
+                  value={currentchannels.createdBy.name}
+                  // onChange={this.onChangeusername}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="title">User Avatar</label>
+                <div
+                  className=""
+                  style={{
+                    height: "100px",
+                    width: "100px",
+                  }}
+                >
+                  <img
+                    type="file"
+                    className="profile"
+                    id="avatar"
+                    src={currentchannels.createdBy.avatar}
+                  />
+                </div>
+              </div>
             </form>
 
-            <button
-              className="badge badge-danger mr-2"
+            <Button
+              className="m-3  btn-sm "
+              type="submit"
+              variant="contained"
+              color="secondary"
               onClick={this.deletechannels}
             >
               Delete
-            </button>
+            </Button>
 
-            <button
+            <Button
+              color="secondary"
+              className="m-3  btn-sm "
               type="submit"
-              className="badge badge-success"
+              variant="contained"
               onClick={this.updatechannels}
             >
               Update
-            </button>
+            </Button>
             <p>{this.state.message}</p>
           </div>
         ) : (
           <div>
             <br />
-            <p>Please click on a channels...</p>
+            <h4> Click on a channels...</h4>
           </div>
         )}
       </div>

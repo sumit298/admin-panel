@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import usersDataService from "../services/users.service";
-
 import Users from "./users.component";
+import Button from "@material-ui/core/Button";
+import "./users.css";
 
+import VisibilityIcon from "@material-ui/icons/Visibility";
 export default class usersList extends Component {
   constructor(props) {
     super(props);
@@ -35,7 +37,7 @@ export default class usersList extends Component {
       users.push({
         key: key,
         name: data.name,
-        /* emailid: data.emailid, */
+        email: data.email,
         photoUrl: data.photoUrl,
       });
     });
@@ -76,7 +78,7 @@ export default class usersList extends Component {
     return (
       <div className="list row">
         <div className="col-md-6">
-          <h4>users List</h4>
+          <h4>Users List</h4>
 
           <ul className="list-group">
             {users &&
@@ -86,20 +88,25 @@ export default class usersList extends Component {
                     "list-group-item " +
                     (index === currentIndex ? "active" : "")
                   }
-                  onClick={() => this.setActiveusers(users, index)}
-                  key={index}
                 >
                   {users.name}
+                  <VisibilityIcon
+                    className="eyeIcon"
+                    onClick={() => this.setActiveusers(users, index)}
+                    key={index}
+                  />
                 </li>
               ))}
           </ul>
 
-          <button
-            className="m-3 btn btn-sm btn-danger"
+          <Button
+            className="m-3  btn-sm "
+            variant="contained"
+            color="secondary"
             onClick={this.removeAllusers}
           >
             Remove All
-          </button>
+          </Button>
         </div>
         <div className="col-md-6">
           {currentusers ? (
@@ -107,7 +114,7 @@ export default class usersList extends Component {
           ) : (
             <div>
               <br />
-              <p>Please click on a Tutorial...</p>
+              <h4> Click on a Username...</h4>
             </div>
           )}
         </div>

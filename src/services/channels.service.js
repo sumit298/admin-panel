@@ -4,6 +4,7 @@ const db = firebase.ref("/channels");
 
 class channelsDataService {
   getAll() {
+    console.log(db);
     return db;
   }
 

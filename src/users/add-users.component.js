@@ -1,182 +1,195 @@
-import React, { Component } from "react";
-import usersDataService from "../services/users.service";
+import React from "react";
+import { Grid, Form, Segment, Header, Message, Icon } from "semantic-ui-react";
+import { Link } from "react-router-dom";
+import md5 from "md5";
 import firebase from "firebase";
-require("firebase/auth");
-export default class Addusers extends Component {
-  constructor(props) {
-    super(props);
-    this.onChangename = this.onChangename.bind(this);
-    this.onChangeemail = this.onChangeemail.bind(this);
-    this.onChangepassword = this.onChangepassword.bind(this);
-    this.onChangephotoUrl = this.onChangephotoUrl.bind(this);
-    this.saveusers = this.saveusers.bind(this);
-    this.newusers = this.newusers.bind(this);
+import { ToastContainer, toast } from "react-toastify";
 
-    this.state = {
-      name: "",
-      email: "",
-      password: "",
-      photoUrl: "",
-    };
-  }
+import "react-toastify/dist/ReactToastify.css";
+import Button from "@material-ui/core/Button";
+export default function Register() {
+  const initialState = {
+    userName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  };
 
-  onChangename(e) {
-    this.setState({
-      name: e.target.value,
+  const [registerUserState, setRegisterUserState] =
+    React.useState(initialState);
+  const [errors, setErrors] = React.useState([]);
+  const [status, setStatus] = React.useState("");
+  const [userRef] = React.useState(firebase.database().ref("/users"));
+
+  const handleChange = (event) => {
+    setRegisterUserState({
+      ...registerUserState,
+      [event.target.name]: event.target.value,
     });
-  }
+  };
 
-  onChangeemail(e) {
-    this.setState({
-      email: e.target.value,
+  const formIsValid = () => {
+    let errors = [];
+    let error;
+    if (isFormEmpty(registerUserState)) {
+      error = { message: "Please fill in all the fields" };
+      // toast.error("Please fill in all the fields");
+      setErrors(errors.concat(error));
+      return false;
+    } else if (!isPasswordValid(registerUserState)) {
+      error = { message: "Password is invalid" };
+      setErrors(errors.concat(error));
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const isFormEmpty = ({ userName, email, password, confirmPassword }) => {
+    return !userName || !email || !password || !confirmPassword;
+  };
+
+  const isPasswordValid = ({ password, confirmPassword }) => {
+    if (password.length < 6 || confirmPassword.length < 6) {
+      return false;
+    } else if (password !== confirmPassword) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    if (formIsValid()) {
+      const { email, password } = registerUserState;
+      const errors = [];
+      setErrors(errors);
+      setStatus("PENDING");
+      try {
+        const createdUser = await firebase
+          .auth()
+          .createUserWithEmailAndPassword(email, password);
+
+        try {
+          await createdUser.user.updateProfile({
+            displayName: userName,
+            photoURL: `https://www.gravatar.com/avatar/${md5(
+              createdUser.user.email
+            )}?d=identicon`,
+            email: email,
+          });
+          await saveUser(createdUser);
+          setStatus("RESOLVED");
+        } catch (err) {
+          setStatus("RESOLVED");
+          setErrors(errors.concat({ message: err.message }));
+        }
+      } catch (err) {
+        setStatus("RESOLVED");
+        setErrors(errors.concat({ message: err.message }));
+      }
+    }
+  };
+
+  const saveUser = (createdUser) =>
+    userRef.child(createdUser.user.uid).set({
+      name: createdUser.user.displayName,
+      photoUrl: createdUser.user.photoURL,
+      email: createdUser.user.email,
     });
-  }
-  onChangepassword(e) {
-    this.setState({
-      password: e.target.value,
-    });
-  }
-  onChangephotoUrl(e) {
-    this.setState({
-      photoUrl: e.target.value,
-    });
-  }
 
-  saveusers() {
-    let data = {
-      name: this.state.name,
-      email: this.state.email,
-      password: this.state.password,
-      photoUrl: this.state.photoUrl,
-    };
+  const handleInputError = (errors, inputName) => {
+    return errors.some((err) =>
+      err.message.toLowerCase().includes(inputName.toLowerCase())
+    )
+      ? "error"
+      : "";
+  };
 
-    /* usersDataService
-      .create(data)
-      .then(() => {
-        console.log("Created User successfully!");
-        this.setState({
-          submitted: true,
-        });
-      })
-      .catch((e) => {
-        console.log(e);
-      }); */
+  const { userName, email, password, confirmPassword } = registerUserState;
 
-    const name = this.refs.name.value;
-    const email = this.refs.email.value;
-    const password = this.refs.pass.value;
-    const photoUrl = this.refs.photoUrl.value;
-    console.log(email, password);
-
-    const promise = firebase
-      .auth()
-      .createUserWithEmailAndPassword(email, password);
-
-    promise.then((user) => {
-      var error =
-        "Signup Successfuly " +
-        firebase.auth().currentUser.email +
-        " Please Login";
-      firebase
-        .database()
-        .ref("users/" + firebase.auth().currentUser.uid)
-        .set({
-          email: firebase.auth().currentUser.email,
-          name: name,
-          photoUrl: photoUrl,
-        });
-      this.setState({ err: error });
-    });
-
-    promise.catch((e) => {
-      var error = e.message;
-      this.setState({ err: error });
-    });
-  }
-
-  newusers() {
-    this.setState({
-      name: "",
-      email: "",
-      password: "",
-      photoUrl: "",
-      submitted: false,
-    });
-  }
-
-  render() {
-    return (
-      <div className="submit-form">
-        {this.state.submitted ? (
-          <div>
-            <h4>You submitted successfully!</h4>
-            <button className="btn btn-success" onClick={this.newusers}>
-              Add
-            </button>
-          </div>
-        ) : (
-          <div>
-            <div className="form-group">
-              <label htmlFor="name">UserName</label>
-              <input
-                type="text"
-                className="form-control"
-                id="name"
-                required
-                ref="name"
-                // value={this.state.name}
-                onChange={this.onChangename}
-                name="name"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="emailid">Email-ID</label>
-              <input
-                type="email"
-                className="form-control"
-                id="email"
-                required
-                // value={this.state.email}
-                ref="email"
-                onChange={this.onChangeemail}
-                name="email"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                className="form-control"
-                id="password"
-                required
-                // value={this.state.password}
-                ref="pass"
-                onChange={this.onChangepassword}
-                name="password"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="photoUrl">User Profile</label>
-
-              <input
-                type="file"
-                className="form-control"
-                id="photoUrl"
-                required
-                ref="photoUrl"
-                // value={this.state.photoUrl}
-                onChange={this.onChangephotoUrl}
-                name="photoUrl"
-              />
-            </div>
-
-            <button onClick={this.saveusers} className="btn btn-success">
+  return (
+    <div className="form-add-group">
+      <Grid textAlign="center" verticalAlign="middle" className="app">
+        <Grid.Column style={{ maxWidth: 450 }}>
+          <Header as="h2" color="purple" textAlign="center">
+            <Icon name="puzzle piece" color="purple" />
+            Register New User
+          </Header>
+          <Form onSubmit={onSubmit}>
+            <input
+              fluid
+              type="text"
+              name="userName"
+              icon="user"
+              iconPosition="left"
+              placeholder="User Name"
+              value={userName}
+              onChange={handleChange}
+              className={handleInputError(errors, "userName")}
+            />
+            <input
+              fluid
+              type="email"
+              name="email"
+              icon="mail"
+              iconPosition="left"
+              placeholder="Email"
+              value={email}
+              onChange={handleChange}
+              className={handleInputError(errors, "email")}
+            />
+            <input
+              type="password"
+              name="password"
+              icon="lock"
+              iconPosition="left"
+              placeholder="Password"
+              value={password}
+              onChange={handleChange}
+              className={handleInputError(errors, "password")}
+            />
+            <input
+              type="password"
+              name="confirmPassword"
+              icon="redo"
+              iconPosition="left"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={handleChange}
+              className={handleInputError(errors, "password")}
+            />
+            <Button
+              disabled={status === "PENDING"}
+              className={status === "PENDING" ? "loading" : ""}
+              type="submit"
+              fluid
+              color="secondary"
+              variant="contained"
+            >
               Submit
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  }
+            </Button>
+          </Form>
+          {errors.length > 0 &&
+            errors.map((err, i) => (
+              <Message error key={i}>
+                <h6>{err.message}</h6>
+              </Message>
+            ))}
+        </Grid.Column>
+      </Grid>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+    </div>
+  );
 }

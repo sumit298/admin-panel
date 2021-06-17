@@ -1,5 +1,5 @@
 import firebase from "../firebase";
-import auth from "../firebase";
+// import auth from "../firebase";
 const db = firebase.ref("/users");
 class usersDataService {
   getAll() {

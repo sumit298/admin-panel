@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import usersDataService from "../services/users.service";
-
+import Button from "@material-ui/core/Button";
+import firebase from "firebase";
+import "./users.css";
 export default class users extends Component {
   constructor(props) {
     super(props);
     this.onChangename = this.onChangename.bind(this);
-    /*  this.onChangeemailid = this.onChangeemailid.bind(this); */
     this.onChangephotoUrl = this.onChangephotoUrl.bind(this);
     this.updateusers = this.updateusers.bind(this);
     this.deleteusers = this.deleteusers.bind(this);
@@ -14,7 +15,7 @@ export default class users extends Component {
       currentusers: {
         key: null,
         name: "",
-        /*  emailid: "", */
+        email: "",
         photoUrl: [],
       },
       message: "",
@@ -52,16 +53,6 @@ export default class users extends Component {
     });
   }
 
-  /*  onChangeemailid(e) {
-    const emailid = e.target.value;
-
-    this.setState((prevState) => ({
-      currentusers: {
-        ...prevState.currentusers,
-        emailid: emailid,
-      },
-    }));
-  } */
   onChangephotoUrl(e) {
     const photoUrl = e.target.value;
 
@@ -76,7 +67,7 @@ export default class users extends Component {
   updateusers() {
     const data = {
       name: this.state.currentusers.name,
-      /*  emailid: this.state.currentusers.emailid, */
+      // email: firebase.auth().currentusers.email,
       photoUrl: this.state.currentusers.photoUrl,
     };
 
@@ -95,6 +86,7 @@ export default class users extends Component {
   deleteusers() {
     usersDataService
       .delete(this.state.currentusers.key)
+
       .then(() => {
         this.props.refreshList();
       })
@@ -105,7 +97,7 @@ export default class users extends Component {
 
   render() {
     const { currentusers } = this.state;
-
+    console.log(currentusers);
     return (
       <div>
         <h4>users</h4>
@@ -131,26 +123,23 @@ export default class users extends Component {
                   onChange={this.onChangename}
                 />
               </div>
-              {/*  <div className="form-group">
-                <label htmlFor="emailid">Email-ID</label>
+              <div className="form-group">
+                <label htmlFor="email">Email-ID</label>
                 <input
-                  type="text"
+                  type="email"
                   className="form-control"
-                  id="emailid"
-                  value={currentusers.emailid}
-                  onChange={this.onChangeemailid}
+                  id="email"
+                  value={currentusers.email}
                 />
-              </div> */}
+              </div>
               <div className="form-group">
                 <label htmlFor="photoUrl">User Profile</label>
-                <div
-                  className=""
-                  style={{
-                    height: "100px",
-                    width: "100px",
-                  }}
-                >
-                  <img src={currentusers.photoUrl} className="profile" />
+                <div className="">
+                  <img
+                    src={currentusers.photoUrl}
+                    className="profile"
+                    alt="User Profile"
+                  />
                 </div>
                 <input
                   type="file"
@@ -161,20 +150,24 @@ export default class users extends Component {
               </div>
             </form>
 
-            <button
-              className="badge badge-danger mr-2"
+            <Button
+              variant="contained"
+              color="secondary"
+              className="m-3  btn-sm "
               onClick={this.deleteusers}
             >
               Delete
-            </button>
+            </Button>
 
-            <button
+            <Button
+              className="m-3  btn-sm "
               type="submit"
-              className="badge badge-success"
+              variant="contained"
+              color="secondary"
               onClick={this.updateusers}
             >
               Update
-            </button>
+            </Button>
             <p>{this.state.message}</p>
           </div>
         ) : (

@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import channelsDataService from "../services/channels.service";
 import Channels from "./channels.component";
-
+import "./channels.css";
+import Button from "@material-ui/core/Button";
+import VisibilityIcon from "@material-ui/icons/Visibility";
 export default class channelsList extends Component {
   constructor(props) {
     super(props);
@@ -35,7 +37,7 @@ export default class channelsList extends Component {
         key: key,
         name: data.name,
         details: data.details,
-        
+        createdBy: data.createdBy,
       });
     });
 
@@ -54,6 +56,7 @@ export default class channelsList extends Component {
   setActivechannels(channels, index) {
     this.setState({
       currentchannels: channels,
+
       currentIndex: index,
     });
   }
@@ -71,6 +74,7 @@ export default class channelsList extends Component {
 
   render() {
     const { channels, currentchannels, currentIndex } = this.state;
+    // console.log(channels, currentchannels, currentIndex);
 
     return (
       <div className="list row">
@@ -85,28 +89,36 @@ export default class channelsList extends Component {
                     "list-group-item " +
                     (index === currentIndex ? "active" : "")
                   }
-                  onClick={() => this.setActivechannels(channels, index)}
-                  key={index}
                 >
                   {channels.name}
+                  <VisibilityIcon
+                    className="eyeIcon"
+                    onClick={() => this.setActivechannels(channels, index)}
+                    key={index}
+                  />
                 </li>
               ))}
           </ul>
 
-          <button
-            className="m-3 btn btn-sm btn-danger"
+          <Button
+            className="m-3 btn-sm "
+            variant="contained"
+            color="secondary"
             onClick={this.removeAllchannels}
           >
             Remove All
-          </button>
+          </Button>
         </div>
         <div className="col-md-6">
           {currentchannels ? (
-            <Channels channels={currentchannels} refreshList={this.refreshList} />
+            <Channels
+              channels={currentchannels}
+              refreshList={this.refreshList}
+            />
           ) : (
             <div>
               <br />
-              <p>Please click on a Tutorial...</p>
+              <p>Click on a Channel Name...</p>
             </div>
           )}
         </div>
